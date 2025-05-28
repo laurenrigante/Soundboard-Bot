@@ -58,6 +58,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
     } else if (id.startsWith("paginate_")) {
       const handlePageNavigation = require("./interactions/navigation/handlePageNavigation");
       return handlePageNavigation(interaction);
+    } else if (id.startsWith("sound_")) {
+      const handleSoundClick = require("./interactions/buttons/handleSoundClick");
+      return handleSoundClick(interaction);
     }
   }
 });

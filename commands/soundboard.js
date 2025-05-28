@@ -3,6 +3,7 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  MessageFlags,
 } = require("discord.js");
 
 const { joinVoiceChannel, getVoiceConnection } = require("@discordjs/voice");
@@ -19,13 +20,16 @@ module.exports = {
     if (!userVoiceChannel) {
       return await interaction.reply({
         content: "❌ You must be in a voice channel to use the soundboard.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
     const existingConnection = getVoiceConnection(interaction.guild.id);
 
     //bot joins the voice channel that the user is in
-    if (!existingConnection) {
+    if (
+      !existingConnection ||
+      existingConnection.joinConfig.channelId !== userVoiceChannel.id
+    ) {
       joinVoiceChannel({
         channelId: userVoiceChannel.id,
         guildId: interaction.guild.id,
@@ -49,9 +53,18 @@ module.exports = {
         .setStyle(ButtonStyle.Success)
     );
 
-    await interaction.reply({
-      content: "🎵 Pick a category:",
-      components: [row],
-    });
+    if (interaction.deferred || interaction.replied) {
+      await interaction.followUp({
+        content: "🎵 Pick a category:",
+        components: [row],
+        ephemeral: true,
+      });
+    } else {
+      await interaction.reply({
+        content: "🎵 Pick a category:",
+        components: [row],
+        ephemeral: true,
+      });
+    }
   },
 };
