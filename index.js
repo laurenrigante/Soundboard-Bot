@@ -55,6 +55,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (id.startsWith("category_")) {
       const handleCategoryClick = require("./interactions/categories/handleCategoryClick");
       return handleCategoryClick(interaction);
+    } else if (id.startsWith("paginate_")) {
+      const handlePageNavigation = require("./interactions/navigation/handlePageNavigation");
+      return handlePageNavigation(interaction);
     }
   }
 });

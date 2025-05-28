@@ -1,7 +1,10 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const getSoundPath = require("../../utils/getSoundPath");
-const { soundMap } = require("../../utils/soundMap");
+const soundMap = require("../../utils/soundMap");
+const renderSoundPage = require("../../utils/renderSoundPage");
 
+/**
+ * This function is triggered when the user clicks a category (happy angry meme)
+ * It will load the list of sounds and show the first page
+ */
 module.exports = async function handleCategoryClick(interaction) {
   const categoryId = interaction.customId.split("_")[1];
 
@@ -11,22 +14,12 @@ module.exports = async function handleCategoryClick(interaction) {
   if (!soundList) {
     return interaction.reply({ content: "Unknown category", ephemeral: true });
   }
+  // Render the first page of sounds (page 1)
+  const pageData = renderSoundPage(categoryId, soundList, 1);
 
-  //converting each sound to a clickable button
-  const soundButtons = soundList.map(
-    (sound, i) =>
-      new ButtonBuilder()
-        .setCustomId(`sound_${categoryId}_${i}`)
-        .setLabel(sound.label)
-        .setStyle(ButtonStyle.Secondary) //grey
-  );
-
-  //row of buttons - maximum of 5 per row
-  const row = new ActionRowBuilder().addComponents(soundButtons);
-
-  //update the original message with the new buttons
+  // Update the interaction with the first page content and buttons
   await interaction.update({
-    content: `🎧 Sounds in category: **${categoryId}**`,
-    components: [row],
+    content: pageData.content,
+    components: pageData.components,
   });
 };
