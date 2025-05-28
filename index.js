@@ -37,7 +37,6 @@ client.once("ready", () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
 });
 
-
 // Handle slash commands
 client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.isChatInputCommand()) {
@@ -62,11 +61,41 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (id.startsWith("category_")) {
       const category = id.split("_")[1];
 
-      // Dummy sounds — replace with your real data
       const dummySounds = {
-        meme: ["Airhorn", "Bruh", "Sad Violin"],
-        angry: ["Rage Quit", "Boom", "Triggered"],
-        happy: ["Yay", "Clap", "Woohoo"],
+        meme: [
+          "Fart",
+          "Bad to the Bone",
+          "A Few Moments Later",
+          "Disgostang",
+          "Do the Roar",
+          "Shrek Swamp",
+          "Drake Embarrassing",
+          "Klonk",
+          "Im Pickle Rick",
+          "Vine Boom",
+          "Windows Startup",
+        ],
+        angry: [
+          "This Guy Stinks",
+          "I Dont Give a Shit",
+          "Avada Kedavra",
+          "Nooo",
+          "Punch",
+          "Spongebob Fail",
+          "Steve OOH",
+          "Sad Music",
+          "Who Cares",
+        ],
+        happy: [
+          "Yay",
+          "Ding",
+          "Aha",
+          "Good Morning Pineapple",
+          "Jeremy Noise",
+          "Lets a Go",
+          "W's in the Chat",
+          "Celebration",
+        ],
       };
 
       const sounds = dummySounds[category] || [];
@@ -87,7 +116,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       });
     }
 
-    // TODO: IMPLEMENT SOUND PLAYBACK.... 
+    // TODO: IMPLEMENT SOUND PLAYBACK....
     else if (id.startsWith("sound_")) {
       const soundName = id.split("_")[1];
       await interaction.reply({
@@ -97,7 +126,5 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
   }
 });
-
-
 
 client.login(process.env.DISCORD_TOKEN);
