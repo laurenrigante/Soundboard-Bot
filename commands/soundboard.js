@@ -5,13 +5,35 @@ const {
   ButtonStyle,
 } = require("discord.js");
 
+const { joinVoiceChannel, getVoiceConnection } = require("@discordjs/voice");
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("soundboard")
     .setDescription("Open the soundboard menu"),
 
   async execute(interaction) {
-    // Create a select menu with some sounds
+    const userVoiceChannel = interaction.member.voice.channel;
+
+    //user must be in a voice channel to use the bot
+    if (!userVoiceChannel) {
+      return await interaction.reply({
+        content: "❌ You must be in a voice channel to use the soundboard.",
+        ephemeral: true,
+      });
+    }
+    const existingConnection = getVoiceConnection(interaction.guild.id);
+
+    //bot joins the voice channel that the user is in
+    if (!existingConnection) {
+      joinVoiceChannel({
+        channelId: userVoiceChannel.id,
+        guildId: interaction.guild.id,
+        adapterCreator: interaction.guild.voiceAdapterCreator,
+        selfDeaf: false,
+      });
+    }
+
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("category_meme")
