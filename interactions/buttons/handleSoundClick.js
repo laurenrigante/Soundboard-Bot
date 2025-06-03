@@ -1,18 +1,16 @@
 const {
   getVoiceConnection,
-  createAudioPlayer,
-  createAudioResource,
-  AudioPlayerStatus,
+  joinVoiceChannel,
   entersState,
   VoiceConnectionStatus,
 } = require("@discordjs/voice");
-const path = require("path");
+const { playSound } = require("../../services/soundService");
+const soundmap = require("../../utils/soundMap");
 
 module.exports = async function handleSoundClick(interaction) {
   const userVoiceChannel = interaction.member.voice.channel;
   const guildId = interaction.guild.id;
 
-  //double check that the user is in a voice channel
   if (!userVoiceChannel) {
     return await interaction.reply({
       content: "❌ You must be in a voice channel to play sounds.",
@@ -20,35 +18,53 @@ module.exports = async function handleSoundClick(interaction) {
     });
   }
 
-  // check if bot is connected to voice
-  const connection = getVoiceConnection(guildId);
+  // Try to get existing voice connection
+  let connection = getVoiceConnection(guildId);
 
-  if (!connection || connection.joinConfig.channelId !== userVoiceChannel.id) {
-    return await interaction.reply({
-      content: "❌ I'm not connected to your voice channel.",
+  if (!connection) {
+    connection = joinVoiceChannel({
+      channelId: userVoiceChannel.id,
+      guildId,
+      adapterCreator: interaction.guild.voiceAdapterCreator,
+      selfDeaf: false,
+    });
+
+    try {
+      await entersState(connection, VoiceConnectionStatus.Ready, 5_000);
+    } catch (error) {
+      connection.destroy();
+      return interaction.reply({
+        content: "❌ Failed to connect to the voice channel.",
+        ephemeral: true,
+      });
+    }
+  } else if (connection.joinConfig.channelId !== userVoiceChannel.id) {
+    return interaction.reply({
+      content: "❌ I'm already in a different voice channel.",
       ephemeral: true,
     });
   }
 
-  const soundName = interaction.customId.replace("sound_", "");
+  const [_, category, indexStr] = interaction.customId.split("_");
+  const index = parseInt(indexStr, 10);
 
-  const soundPath = path.join(__dirname, "../../sounds", `${soundName}.mp3`);
-  const resource = createAudioResource(soundPath);
-  const player = createAudioPlayer();
+  if (!soundmap[category] || isNaN(index) || !soundmap[category][index]) {
+    return await interaction.reply({
+      content: "❌ Sound not found.",
+      ephemeral: true,
+    });
+  }
 
-  player.play(resource);
-  connection.subscribe(player);
+  const soundFile = soundmap[category][index].file;
 
-  player.once(AudioPlayerStatus.Playing, () => {
-    console.log(`🎵 Now playing: ${soundName}`);
-  });
-
-  player.once(AudioPlayerStatus.Idle, () => {
-    console.log(`✅ Finished playing: ${soundName}`);
-  });
-
-  await interaction.reply({
-    content: `▶️ Playing **${soundName}**`,
-    ephemeral: true,
-  });
+  try {
+    await playSound(connection, category, soundFile);
+    await interaction.deferUpdate(); //dont want to send too many chat messages as it will clog the server
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({
+      content: "❌ Failed to play the sound.",
+      ephemeral: true,
+    });
+  }
 };
