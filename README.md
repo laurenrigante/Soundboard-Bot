@@ -5,7 +5,7 @@
 > A fun and interactive Discord bot that lets you play a curated collection of sounds right in your voice channel! Perfect for adding some personality, humor, or surprises to your server’s conversations. Developed as a fun passion project for my own servers with friends, which I have decided to make available to anyone!
 
 
- [Invite the Soundboard Bot to your server](https://discord.com/oauth2/authorize?client_id=1376663769689751642&permissions=2150631424&integration_type=0&scope=bot+applications.commands)
+ [Invite the Soundboard Bot to your server](https://discord.com/oauth2/authorize?client_id=1376663769689751642&permissions=2150632448&integration_type=0&scope=bot+applications.commands)
 
 ---
 
