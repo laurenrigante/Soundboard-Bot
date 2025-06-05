@@ -1,5 +1,8 @@
 [phases.setup]
 nixPkgs = ["ffmpeg"]
 
+[phases.build]
+cmd = "nix-env -iA nixpkgs.ffmpeg"
+
 [start]
 cmd = "node index.js"
