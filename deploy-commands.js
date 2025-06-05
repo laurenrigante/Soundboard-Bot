@@ -21,10 +21,7 @@ const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
     console.log("Started refreshing application (slash) commands.");
 
     await rest.put(
-      Routes.applicationGuildCommands(
-        process.env.CLIENT_ID,
-        process.env.GUILD_ID
-      ), // for guild commands, faster for dev
+      Routes.applicationCommands(process.env.CLIENT_ID), //changing for global commands
       { body: commands }
     );
 
